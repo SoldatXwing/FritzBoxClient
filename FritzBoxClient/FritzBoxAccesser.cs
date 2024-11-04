@@ -6,9 +6,21 @@ using System.Net;
 using System.Text;
 namespace FritzBoxClient;
 
+
 public class FritzBoxAccesser : BaseAccesser
 {
+    /// <summary>
+    /// Initializes a new instance of the FritzBoxAccesser with specified credentials.
+    /// </summary>
+    /// <param name="fritzBoxPassword">Password for FritzBox login.</param>
+    /// <param name="fritzBoxUrl">URL of the FritzBox (default is "https://fritz.box").</param>
+    /// <param name="userName">Username for FritzBox login.</param>
     public FritzBoxAccesser(string fritzBoxPassword, string fritzBoxUrl = "https://fritz.box", string userName = "") => (FritzBoxUrl, Password, FritzUserName) = (fritzBoxUrl, fritzBoxPassword, userName);
+    /// <summary>
+    /// Retrieves the JSON for the FritzBox overview page.
+    /// </summary>
+    /// <returns>JSON string of the overview page.</returns>
+    /// <exception cref="Exception">Thrown if fetching fails.</exception>
     private async Task<string> GetOverViewPageJsonAsync()
     {
         if (!IsSidValid)
@@ -19,6 +31,11 @@ public class FritzBoxAccesser : BaseAccesser
             return await response.Content.ReadAsStringAsync();
         throw new Exception("Failed to fetch fritzbox overview page json");
     }
+    /// <summary>
+    /// Retrieves the JSON for the FritzBox WiFi radio network page.
+    /// </summary>
+    /// <returns>JSON string of the WiFi radio network page.</returns>
+    /// <exception cref="Exception">Thrown if fetching fails.</exception>
     private async Task<string> GetWifiRadioNetworkPageJsonAsync()
     {
         if(!IsSidValid)
@@ -29,6 +46,11 @@ public class FritzBoxAccesser : BaseAccesser
             return await response.Content.ReadAsStringAsync();
         throw new Exception("Failed to fetch fritzbox Wifi radio network page json");
     }
+    /// <summary>
+    /// Resolves IP addresses and UIDs for a list of devices in the local network.
+    /// </summary>
+    /// <param name="devices">List of devices to resolve IP and UID for.</param>
+    /// <returns>List of devices with updated IP and UID.</returns>
     public async Task<List<Device>> ResolveIpsAndUidForDevices(List<Device> devices)
     {
         var response = await GetWifiRadioNetworkPageJsonAsync();
@@ -62,10 +84,10 @@ public class FritzBoxAccesser : BaseAccesser
 
     }
     /// <summary>
-    /// Task to get all active devices in local Network. Note: if getWithIp is enabled, the Task takes more time.
+    /// Retrieves all active devices in the local network. 
     /// </summary>
-    /// <param name="getWithIpAndUid">Bool if the ip attribut should be filled</param>
-    /// <returns>A list of Devices</returns>
+    /// <param name="getWithIpAndUid">Specifies if IP and UID should be included.</param>
+    /// <returns>List of devices in the local network.</returns>
     public async Task<List<Device>> GetAllDevciesInNetworkAsync(bool getWithIpAndUid = false)
     {
         var result = JsonConvert.DeserializeObject<FritzBoxResponse>(await GetOverViewPageJsonAsync())!.Data.Net.Devices!;
@@ -73,6 +95,13 @@ public class FritzBoxAccesser : BaseAccesser
             return result;
         return await ResolveIpsAndUidForDevices(result);
     }
+    /// <summary>
+    /// Retrieves a single device by name.
+    /// </summary>
+    /// <param name="deviceName">Name of the device.</param>
+    /// <returns>The device with the specified name.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the device is not found.</exception>
+
     public async Task<Device> GetSingleDeviceAsync(string deviceName)
     {
         var response = JObject.Parse(await GetWifiRadioNetworkPageJsonAsync());
@@ -81,9 +110,16 @@ public class FritzBoxAccesser : BaseAccesser
                 ?.ToString();
 
         if (deviceJson is null)
-            throw new KeyNotFoundException($"No Device with name: {deviceName} found!");
+            throw new InvalidOperationException($"No Device with name: {deviceName} found!");
         return JsonConvert.DeserializeObject<Device>(deviceJson)!;
     }
+    /// <summary>
+    /// Retrieves a single device by IP address.
+    /// </summary>
+    /// <param name="ip">IP address of the device.</param>
+    /// <returns>The device with the specified IP address.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the device is not found.</exception>
+
     public async Task<Device> GetSingleDeviceAsync(IPAddress ip)
     {
         var response = JObject.Parse(await GetWifiRadioNetworkPageJsonAsync());
@@ -92,19 +128,18 @@ public class FritzBoxAccesser : BaseAccesser
                         ?.ToString();
 
         if (deviceJson is null)
-            throw new KeyNotFoundException($"No Device with ip: {ip} found!");
+            throw new InvalidOperationException($"No Device with ip: {ip} found!");
         return JsonConvert.DeserializeObject<Device>(deviceJson)!;
     }
     /// <summary>
-    /// Method to change a access state for a device in local network.
+    /// Changes the internet access state for a specified device in the local network.
     /// </summary>
-    /// <param name="devName">Devicename aka "name"</param>
-    /// <param name="internetDetailState">Internet state for device</param>
-    /// <param name="ipAdress">Ip from device</param>
-    /// <param name="dev">Dev from device, aka "uid"</param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException">Paramters cant be empty or null</exception>
-    /// <exception cref="ArgumentException">Invalid ip adress format</exception>
+    /// <param name="devName">Device name.</param>
+    /// <param name="internetDetailState">New internet access state.</param>
+    /// <param name="ipAdress">IP address of the device.</param>
+    /// <param name="dev">UID of the device.</param>
+    /// <exception cref="NotImplementedException">Thrown if parameters are missing.</exception>
+    /// <exception cref="ArgumentException">Thrown if IP address format is invalid.</exception>
     public async Task ChangeInternetAccessStateForDeviceAsync(string devName, InternetDetail internetDetailState, IPAddress ipAdress, string dev)
     {
         if (string.IsNullOrEmpty(devName) ||
@@ -146,13 +181,12 @@ public class FritzBoxAccesser : BaseAccesser
 
     }
     /// <summary>
-    /// Method to change a access state for a device in local network.
+    /// Changes the internet access state for a specified device.
     /// </summary>
-    /// <param name="device">Device with given properties</param>
-    /// <param name="internetDetailState">Internet state for device</param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException">Paramters cant be empty or null</exception>
-    /// <exception cref="ArgumentException">Invalid ip adress format</exception>
+    /// <param name="device">Device object with properties.</param>
+    /// <param name="internetDetailState">New internet access state.</param>
+    /// <exception cref="NotImplementedException">Thrown if parameters are missing.</exception>
+    /// <exception cref="ArgumentException">Thrown if IP address format is invalid.</exception>
     public async Task ChangeInternetAccessStateForDeviceAsync(Device device, InternetDetail internetDetailState)
     {
         if (string.IsNullOrEmpty(device.Name) ||
@@ -194,10 +228,10 @@ public class FritzBoxAccesser : BaseAccesser
 
     }
     /// <summary>
-    /// Reconnect router to recieve a new IP adress from provider
+    /// Reconnects the FritzBox to obtain a new IP address from the provider.
     /// </summary>
-    /// <returns></returns>
-    /// <exception cref="Exception">Throws if fails</exception>
+    /// <returns>Task representing the asynchronous operation.</returns>
+    /// <exception cref="Exception">Thrown if reconnection fails.</exception>
     public async Task ReconnectAsync()
     {
         var sid = await GenerateSessionIdAsync();

@@ -1,26 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FritzBoxApi.Tests
+﻿namespace FritzBoxApi.Tests
 {
     internal class FritzBoxAccesserTests
     {
         [Test]
         public async Task GetAllDevicesInNetworkAsync_Success()
         {
-            List<Device> devices = await SetUp.FritzBoxAccesser.GetAllDevciesInNetworkAsync();  
-            Assert.IsNotNull(devices);
-            Assert.That(devices.Count, Is.GreaterThan(0));
+            List<Device> devices = await SetUp.FritzBoxAccesser.GetAllDevciesInNetworkAsync();
+            Assert.Multiple(() =>
+            {
+                Assert.That(devices, Is.Not.Null);
+                Assert.That(devices.Count, Is.GreaterThan(0));
+            });
         }
         [Test]
         public async Task GetAllDevicesInNetworkAsyncWithIpAndUid_Success()
         {
             List<Device> devices = await SetUp.FritzBoxAccesser.GetAllDevciesInNetworkAsync(true);
-            Assert.IsNotNull(devices);
-            Assert.That(devices.Count, Is.GreaterThan(0));
+            Assert.Multiple(() =>
+            {
+                Assert.That(devices, Is.Not.Null);
+                Assert.That(devices, Is.Not.Empty);
+            });
         }
         [Test]
         public void ChangeInternetAccessState_EmptyParameters()
@@ -29,12 +29,16 @@ namespace FritzBoxApi.Tests
                 await SetUp.FritzBoxAccesser.ChangeInternetAccessStateForDeviceAsync(
                     "",
                     FritzBoxClient.Models.InternetDetail.Unlimited,
-                    new System.Net.IPAddress(new byte[] {2,2,2,2}),
+                    new System.Net.IPAddress(new byte[] { 2, 2, 2, 2 }),
                     ""
                 )
             );
-            Assert.IsNotNull(exception);
-            Assert.IsTrue(exception.Message.Contains("Parameters cant be empty or null!"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(exception, Is.Not.Null);
+                Assert.That(exception.Message, Does.Contain("Parameters cant be empty or null!"));
+            });
+
         }
     }
 }

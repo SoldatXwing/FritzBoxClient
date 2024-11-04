@@ -37,7 +37,6 @@ namespace FritzBoxClient
             try
             {
                 var response = HttpRequestFritzBox("/login_sid.lua", null, HttpRequestMethod.Get);
-                var t = await response.Content.ReadAsStringAsync();
                 var xml = XDocument.Parse(await response.Content.ReadAsStringAsync());
                 var sid = xml.Root!.Element("SID")!.Value;
                 if (sid != "0000000000000000")

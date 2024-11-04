@@ -13,21 +13,24 @@ namespace FritzBoxApi.Tests
         public async Task GetNasBaseStorageDiskInfo_Success()
         {
             var result = await SetUp.NasAccesser.GetNasStorageDiskInfoAsync();
-            Assert.IsNotNull(result);
+            Assert.That(result, Is.Not.Null);
         }
         [Test]
         public async Task GetNasBaseFoldersAsync_Success()
         {
             var result = await SetUp.NasAccesser.GetNasFoldersAsync();
-            Assert.IsNotNull(result);
+            Assert.That(result, Is.Not.Null);
         }
         [Test]
         public void GetNasFileBytes_WrongPath()
         {
             var exception = Assert.ThrowsAsync<InvalidOperationException>(async () => await SetUp.NasAccesser.GetNasFileBytes("/huhuh/se.jpg"));
 
-            Assert.IsNotNull(exception);
-            Assert.IsTrue(exception.Message.Contains("Failed to get file bytes"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(exception, Is.Not.Null);
+                Assert.That(exception.Message, Does.Contain("Failed to get file bytes"));
+            });
         }
     }
 }

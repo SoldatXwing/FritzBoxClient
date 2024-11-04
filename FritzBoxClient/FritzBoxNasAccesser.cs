@@ -4,10 +4,24 @@ using System.Net.Http.Headers;
 using System.Text;
 namespace FritzBoxClient
 {
+    /// <summary>
+    /// Provides access to NAS storage on a FritzBox router, allowing for file retrieval, storage information access, and file uploads.
+    /// </summary>
     public class FritzBoxNasAccesser : BaseAccesser
     {
+        /// <summary>
+        /// Initializes a new instance of the FritzBoxNasAccesser with specified FritzBox credentials.
+        /// </summary>
+        /// <param name="fritzBoxPassword">Password for FritzBox login.</param>
+        /// <param name="fritzBoxUrl">URL of the FritzBox (default is https://fritz.box).</param>
+        /// <param name="userName">Username for FritzBox login (optional).</param>
         public FritzBoxNasAccesser(string fritzBoxPassword, string fritzBoxUrl = "https://fritz.box", string userName = "") => (FritzBoxUrl, Password, FritzUserName) = (fritzBoxUrl, fritzBoxPassword, userName);
-        
+        /// <summary>
+        /// Gets disk information of the NAS storage at the specified path.
+        /// </summary>
+        /// <param name="path">Path in the NAS directory (default is root "/").</param>
+        /// <returns>A DiskInfo object containing storage information.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the path is invalid or disk information is unavailable.</exception>
         public async Task<DiskInfo> GetNasStorageDiskInfoAsync(string path = "/")
         {
             if (!path.StartsWith("/"))
@@ -18,6 +32,12 @@ namespace FritzBoxClient
 
             throw new InvalidOperationException("Disk information is not available.");
         }
+        /// <summary>
+        /// Retrieves a list of directories (folders) in the specified NAS path.
+        /// </summary>
+        /// <param name="path">Path in the NAS directory (default is root "/").</param>
+        /// <returns>A list of NasDirectory objects representing folders in the path.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the path is invalid or directories are unavailable.</exception>
         public async Task<List<NasDirectory>> GetNasFoldersAsync(string path = "/")
         {
             if (!path.StartsWith("/"))
@@ -28,6 +48,12 @@ namespace FritzBoxClient
 
             throw new InvalidOperationException("Fodlers are not available.");
         }
+        /// <summary>
+        /// Gets the bytes of a file from the NAS at the specified path.
+        /// </summary>
+        /// <param name="path">Path to the file in the NAS directory.</param>
+        /// <returns>A byte array containing the file data.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the path is invalid or file retrieval fails.</exception>
         public async Task<List<NasFile>> GetNasFilesAsync(string path = "/")
         {
             if (!path.StartsWith("/"))
@@ -38,9 +64,23 @@ namespace FritzBoxClient
 
             throw new InvalidOperationException("Files are not available");
         }
+        /// <summary>
+        /// Asynchronously retrieves information about a NAS directory from a Fritz!Box router.
+        /// </summary>
+        /// <param name="path">The path of the directory to retrieve information for. Must start with "/".</param>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result contains the 
+        /// <see cref="FirtzBoxNasResponse"/> object representing the directory information.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the provided path does not start with "/".
+        /// </exception>
+        /// <exception cref="Exception">
+        /// Thrown when the request to fetch NAS server information fails.
+        /// </exception>
         private async Task<FirtzBoxNasResponse> GetNasDirectoryInfoAsync(string path = "/")
         {
-            if(!path.StartsWith("/"))
+            if (!path.StartsWith("/"))
                 throw new InvalidOperationException(@"Path has to start with: ""/""");
             if (!IsSidValid)
                 await GenerateSessionIdAsync();
@@ -50,6 +90,12 @@ namespace FritzBoxClient
                 return JsonConvert.DeserializeObject<FirtzBoxNasResponse>(await response.Content.ReadAsStringAsync())!;
             throw new Exception("Failed to fetch nas server");
         }
+        /// <summary>
+        /// Gets the bytes of a file from the NAS at the specified path.
+        /// </summary>
+        /// <param name="path">Path to the file in the NAS directory.</param>
+        /// <returns>A byte array containing the file data.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if the path is invalid or file retrieval fails.</exception>
         public async Task<byte[]> GetNasFileBytes(string path = "/")
         {
             if (!path.StartsWith("/"))
@@ -61,7 +107,17 @@ namespace FritzBoxClient
                 return await response.Content.ReadAsByteArrayAsync();
             throw new InvalidOperationException("Failed to get file bytes");
         }
-        public async Task<HttpResponseMessage> UploadFileAsync(string relativeUrl,string relativeNasUrl, long modificationTime, byte[] fileBytes, string fileName)
+        /// <summary>
+        /// Uploads a file to the NAS at the specified path.
+        /// </summary>
+        /// <param name="relativeUrl">Relative URL for the upload endpoint.</param>
+        /// <param name="relativeNasUrl">Path in the NAS where the file will be uploaded.</param>
+        /// <param name="modificationTime">Modification time of the file in Unix format.</param>
+        /// <param name="fileBytes">Byte array of the file to upload.</param>
+        /// <param name="fileName">Name of the file to upload.</param>
+        /// <returns>A HttpResponseMessage indicating the result of the upload.</returns>
+        /// <exception cref="Exception">Thrown if upload fails.</exception>
+        public async Task<HttpResponseMessage> UploadFileAsync(string relativeUrl, string relativeNasUrl, long modificationTime, byte[] fileBytes, string fileName)
         {
             if (!IsSidValid)
                 await GenerateSessionIdAsync();
@@ -82,6 +138,11 @@ namespace FritzBoxClient
             var t = await response.Content.ReadAsStringAsync();
             return response;
         }
+        /// <summary>
+        /// Detects the MIME type of a file based on its byte content.
+        /// </summary>
+        /// <param name="fileBytes">Byte array of the file to inspect.</param>
+        /// <returns>A string representing the MIME type.</returns>
         private string DetectMimeType(byte[] fileBytes)
         {
             if (fileBytes.Length > 0)
@@ -96,7 +157,15 @@ namespace FritzBoxClient
 
             return "application/octet-stream";
         }
-        public HttpResponseMessage FormDataRequestFritzBox(string relativeUrl, MultipartFormDataContent? formData, HttpRequestMethod method)
+        /// <summary>
+        /// Sends a multipart/form-data request to the FritzBox NAS.
+        /// </summary>
+        /// <param name="relativeUrl">Relative URL for the API endpoint.</param>
+        /// <param name="formData">Form data content for the request.</param>
+        /// <param name="method">HTTP request method (only POST is supported).</param>
+        /// <returns>A HttpResponseMessage indicating the result of the request.</returns>
+        /// <exception cref="NotImplementedException">Thrown if a method other than POST is specified.</exception>
+        private HttpResponseMessage FormDataRequestFritzBox(string relativeUrl, MultipartFormDataContent? formData, HttpRequestMethod method)
         {
             using (var handler = new HttpClientHandler())
             {
