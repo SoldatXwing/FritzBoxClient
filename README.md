@@ -1,5 +1,5 @@
-<h1>FritzBoxApi</h1>
-<span>This simple 'API' will log in to your local FritzBox with the given password and URL (the default URL is https://fritz.box) and can return all devices that are in the local network, and much more.</span>
+<h1>FritzBoxClient</h1>
+<span>This simple client library logs in to your local FRITZ!Box using the provided password and URL (default: https://fritz.box) and provides access to a range of network management features, including retrieving all connected devices and more.</span>
 
 <h1>FritzBoxAcesser usage</h1>
 <span>This simple approach shows how to initialize the FritzBoxAccesser and get the devices from the FritzBox.</span>
