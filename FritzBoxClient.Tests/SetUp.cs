@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using FritzBoxClient;
+using Microsoft.Extensions.Configuration;
 using System.IO;
 
 namespace FritzBoxApi.Tests

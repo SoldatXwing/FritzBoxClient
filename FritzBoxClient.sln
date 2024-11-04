@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34928.147
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FritzBoxClient", "FritzBoxClient\FritzBoxClient.csproj", "{A5ECEE0D-EB56-4489-9D68-CA258B1BDDA1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FritzBoxClient.Tests", "FritzBoxClient.Tests\FritzBoxClient.Tests.csproj", "{DF797039-28E9-444A-9F79-73F8AEF36A0E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A5ECEE0D-EB56-4489-9D68-CA258B1BDDA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5ECEE0D-EB56-4489-9D68-CA258B1BDDA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5ECEE0D-EB56-4489-9D68-CA258B1BDDA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5ECEE0D-EB56-4489-9D68-CA258B1BDDA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF797039-28E9-444A-9F79-73F8AEF36A0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF797039-28E9-444A-9F79-73F8AEF36A0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF797039-28E9-444A-9F79-73F8AEF36A0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF797039-28E9-444A-9F79-73F8AEF36A0E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7F2E3EF5-2ACE-4708-893D-FCAEB8D1605E}
+	EndGlobalSection
+EndGlobal

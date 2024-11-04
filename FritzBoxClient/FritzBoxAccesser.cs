@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Text;
+namespace FritzBoxClient;
 
 public class FritzBoxAccesser : BaseAccesser
 {

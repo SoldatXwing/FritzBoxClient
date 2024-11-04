@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FritzBoxApi\FritzBoxApi.csproj" />
+    <ProjectReference Include="..\FritzBoxClient\FritzBoxClient.csproj" />
   </ItemGroup>
 
   <ItemGroup>

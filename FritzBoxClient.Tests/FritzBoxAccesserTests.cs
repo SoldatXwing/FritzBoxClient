@@ -28,7 +28,7 @@ namespace FritzBoxApi.Tests
             var exception = Assert.ThrowsAsync<NotImplementedException>(async () =>
                 await SetUp.FritzBoxAccesser.ChangeInternetAccessStateForDeviceAsync(
                     "",
-                    Models.InternetDetail.Unlimited,
+                    FritzBoxClient.Models.InternetDetail.Unlimited,
                     new System.Net.IPAddress(new byte[] {2,2,2,2}),
                     ""
                 )
