@@ -1,5 +1,4 @@
-﻿using FritzBoxClient;
-using FritzBoxClient.Models;
+﻿using FritzBoxClient.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
@@ -38,7 +37,7 @@ public class FritzBoxAccesser : BaseAccesser
     /// <exception cref="Exception">Thrown if fetching fails.</exception>
     private async Task<string> GetWifiRadioNetworkPageJsonAsync()
     {
-        if(!IsSidValid)
+        if (!IsSidValid)
             await GenerateSessionIdAsync();
         var content = new StringContent($"xhr=1&sid={CurrentSid}&lang=de&page=wSet&xhrId=all", Encoding.UTF8, "application/x-www-form-urlencoded");
         var response = HttpRequestFritzBox("/data.lua", content, HttpRequestMethod.Post);
@@ -148,8 +147,9 @@ public class FritzBoxAccesser : BaseAccesser
             throw new NotImplementedException("Parameters cant be empty or null!");
         try
         {
-            var sid = await GenerateSessionIdAsync();
-            var interFaceResponse = HttpRequestFritzBox("/data.lua", new StringContent($"xhr=1&sid={sid}&lang=de&page=edit_device&xhrId=all&dev={dev}&back_to_page=wSet", Encoding.UTF8, "application/x-www-form-urlencoded"), HttpRequestMethod.Post);
+            if (!IsSidValid)
+                await GenerateSessionIdAsync();
+            var interFaceResponse = HttpRequestFritzBox("/data.lua", new StringContent($"xhr=1&sid={CurrentSid}&lang=de&page=edit_device&xhrId=all&dev={dev}&back_to_page=wSet", Encoding.UTF8, "application/x-www-form-urlencoded"), HttpRequestMethod.Post);
             var iFaceIdJson = JObject.Parse(await interFaceResponse.Content.ReadAsStringAsync());
             string interFaceId = string.Empty;
             //IPv6
@@ -164,7 +164,7 @@ public class FritzBoxAccesser : BaseAccesser
                 throw new ArgumentException("Invalid IP address format");
 
             var bodyParamters = new StringContent(
-                $"xhr=1&dev_name={devName}&internetdetail={internetDetailState.ToString().ToLower()}&allow_pcp_and_upnp=off&dev_ip0={ipOctets[0]}&dev_ip1={ipOctets[1]}&dev_ip2={ipOctets[2]}&dev_ip3={ipOctets[3]}&dev_ip={ipAdress}&static_dhcp=off&interface_id1={interFaceParts[2]}&interface_id2={interFaceParts[3]}&interface_id3={interFaceParts[4]}&interface_id4={interFaceParts[5]}&back_to_page=wSet&dev={dev}&apply=true&sid={sid}&lang=de&page=edit_device",
+                $"xhr=1&dev_name={devName}&internetdetail={internetDetailState.ToString().ToLower()}&allow_pcp_and_upnp=off&dev_ip0={ipOctets[0]}&dev_ip1={ipOctets[1]}&dev_ip2={ipOctets[2]}&dev_ip3={ipOctets[3]}&dev_ip={ipAdress}&static_dhcp=off&interface_id1={interFaceParts[2]}&interface_id2={interFaceParts[3]}&interface_id3={interFaceParts[4]}&interface_id4={interFaceParts[5]}&back_to_page=wSet&dev={dev}&apply=true&sid={CurrentSid}&lang=de&page=edit_device",
                 Encoding.UTF8,
                 "application/x-www-form-urlencoded"
                 );
@@ -195,8 +195,9 @@ public class FritzBoxAccesser : BaseAccesser
             throw new NotImplementedException("Paramters cant be empty or null!");
         try
         {
-            var sid = await GenerateSessionIdAsync();
-            var interFaceResponse = HttpRequestFritzBox("/data.lua", new StringContent($"xhr=1&sid={sid}&lang=de&page=edit_device&xhrId=all&dev={device.Uid}&back_to_page=wSet", Encoding.UTF8, "application/x-www-form-urlencoded"), HttpRequestMethod.Post);
+            if (!IsSidValid)
+                await GenerateSessionIdAsync();
+            var interFaceResponse = HttpRequestFritzBox("/data.lua", new StringContent($"xhr=1&sid={CurrentSid}&lang=de&page=edit_device&xhrId=all&dev={device.Uid}&back_to_page=wSet", Encoding.UTF8, "application/x-www-form-urlencoded"), HttpRequestMethod.Post);
             var iFaceIdJson = JObject.Parse(await interFaceResponse.Content.ReadAsStringAsync());
             string interFaceId = string.Empty;
             //IPv6
@@ -211,7 +212,7 @@ public class FritzBoxAccesser : BaseAccesser
                 throw new ArgumentException("Invalid IP address format");
 
             var bodyParamters = new StringContent(
-                $"xhr=1&dev_name={device.Name}&internetdetail={internetDetailState.ToString().ToLower()}&allow_pcp_and_upnp=off&dev_ip0={ipOctets[0]}&dev_ip1={ipOctets[1]}&dev_ip2={ipOctets[2]}&dev_ip3={ipOctets[3]}&dev_ip={device.Ip.ToString()}&static_dhcp=off&interface_id1={interFaceParts[2]}&interface_id2={interFaceParts[3]}&interface_id3={interFaceParts[4]}&interface_id4={interFaceParts[5]}&back_to_page=wSet&dev={device.Uid}&apply=true&sid={sid}&lang=de&page=edit_device",
+                $"xhr=1&dev_name={device.Name}&internetdetail={internetDetailState.ToString().ToLower()}&allow_pcp_and_upnp=off&dev_ip0={ipOctets[0]}&dev_ip1={ipOctets[1]}&dev_ip2={ipOctets[2]}&dev_ip3={ipOctets[3]}&dev_ip={device.Ip.ToString()}&static_dhcp=off&interface_id1={interFaceParts[2]}&interface_id2={interFaceParts[3]}&interface_id3={interFaceParts[4]}&interface_id4={interFaceParts[5]}&back_to_page=wSet&dev={device.Uid}&apply=true&sid={CurrentSid}&lang=de&page=edit_device",
                 Encoding.UTF8,
                 "application/x-www-form-urlencoded"
                 );
@@ -234,14 +235,36 @@ public class FritzBoxAccesser : BaseAccesser
     /// <exception cref="Exception">Thrown if reconnection fails.</exception>
     public async Task ReconnectAsync()
     {
-        var sid = await GenerateSessionIdAsync();
-        var content = new StringContent($"xhr=1&sid={sid}&lang=de&page=netMoni&xhrId=reconnect&disconnect=true&useajax=1&no_sidrenew=", Encoding.UTF8, "application/x-www-form-urlencoded");
+        if (!IsSidValid)
+            await GenerateSessionIdAsync();
+        var content = new StringContent($"xhr=1&sid={CurrentSid}&lang=de&page=netMoni&xhrId=reconnect&disconnect=true&useajax=1&no_sidrenew=", Encoding.UTF8, "application/x-www-form-urlencoded");
         var response = HttpRequestFritzBox("/data.lua", content, HttpRequestMethod.Post);
         Thread.Sleep(1000);
-        content = new StringContent($"xhr=1&sid=dac944fb519e10d6&lang=de&page=netMoni&xhrId=reconnect&connect=true&useajax=1&no_sidrenew=");      
-        var secondResponse = HttpRequestFritzBox("/data.lua",content, HttpRequestMethod.Post);
-        if(!response.IsSuccessStatusCode && secondResponse.IsSuccessStatusCode)
+        content = new StringContent($"xhr=1&sid={CurrentSid}&lang=de&page=netMoni&xhrId=reconnect&connect=true&useajax=1&no_sidrenew=");
+        var secondResponse = HttpRequestFritzBox("/data.lua", content, HttpRequestMethod.Post);
+        if (!response.IsSuccessStatusCode && secondResponse.IsSuccessStatusCode)
             throw new Exception("Error reconnecting frit box!");
+    }
+    /// <summary>
+    /// Asynchronously retrieves all open ports with their service names and used protocols from the FritzBox.
+    /// </summary>
+    /// <returns>
+    /// A list of <see cref="Port"/> objects representing the open ports. 
+    /// Each object includes the service name, port number, used protocols, and an index.
+    /// </returns>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the response from the FritzBox indicates failure to retrieve the open ports.
+    /// </exception>
+    public async Task<List<Port>> GetOpenPorts()
+    {
+        if (!IsSidValid)
+            await GenerateSessionIdAsync();
+        var content = new StringContent($"xhr=1&sid={CurrentSid}&lang=de&page=secCheck&xhrId=all", Encoding.UTF8, "application/x-www-form-urlencoded");
+        var response = HttpRequestFritzBox("/data.lua", content, HttpRequestMethod.Post);
+        if (!response.IsSuccessStatusCode)
+            throw new InvalidOperationException("Failed to recieved open ports");
+        return JsonConvert.DeserializeObject<List<Port>>(JObject.Parse(await response.Content.ReadAsStringAsync())["data"]!["homenet"]!["services"]!
+                                                                .ToString())!;
     }
 
 }
