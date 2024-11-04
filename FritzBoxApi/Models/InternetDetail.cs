@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FritzBoxApi.Models
+namespace FritzBoxClient.Models
 {
     public enum InternetDetail
     {

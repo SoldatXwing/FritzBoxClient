@@ -3,7 +3,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace FritzBoxApi
+namespace FritzBoxClient
 {
     public abstract class BaseAccesser : IAccesser
     {

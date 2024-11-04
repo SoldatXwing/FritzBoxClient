@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Reflection.Metadata;
 
-namespace FritzBoxApi.Models.NasModels
+namespace FritzBoxClient.Models.NasModels
 {
     public class DiskInfo
     {

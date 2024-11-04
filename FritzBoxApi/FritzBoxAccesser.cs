@@ -1,5 +1,5 @@
-﻿using FritzBoxApi;
-using FritzBoxApi.Models;
+﻿using FritzBoxClient;
+using FritzBoxClient.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;

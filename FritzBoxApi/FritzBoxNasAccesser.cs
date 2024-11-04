@@ -1,8 +1,8 @@
-﻿using FritzBoxApi.Models.NasModels;
+﻿using FritzBoxClient.Models.NasModels;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text;
-namespace FritzBoxApi
+namespace FritzBoxClient
 {
     public class FritzBoxNasAccesser : BaseAccesser
     {

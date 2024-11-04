@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace FritzBoxApi.Models.NasModels
+namespace FritzBoxClient.Models.NasModels
 {
     public class NasFile
     {
