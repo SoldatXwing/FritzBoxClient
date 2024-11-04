@@ -6,7 +6,7 @@
 <br/><br/>
 
 ```csharp
-using FritzBoxApi;
+using FritzBoxClient;
 public class Program
 {
     private static async Task Main(string[] args)
@@ -30,7 +30,7 @@ FritzBoxAccesser fritzBoxAccesser = new FritzBoxAccesser(fritzBoxPassword: "pass
 </span>
 
 ```csharp
-using FritzBoxApi;
+using FritzBoxClient;
 public class Program
 {
     private static async Task Main(string[] args)
@@ -47,7 +47,7 @@ public class Program
 
 
 ```csharp
-using FritzBoxApi;
+using FritzBoxClient;
 public class Program
 {
     private static async Task Main(string[] args)
