@@ -1,4 +1,4 @@
-﻿using FritzBoxClient.Interfaces;
+﻿using System.Data.Common;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
@@ -6,7 +6,7 @@ using System.Xml.Linq;
 
 namespace FritzBoxClient
 {
-    public abstract class BaseAccesser : IAccesser
+    public abstract class BaseAccesser : IDisposable
     {
         protected string CurrentSid { get; set; } = null!;
         protected DateTime SidTimestamp { get; set; }
@@ -32,7 +32,7 @@ namespace FritzBoxClient
                 return sb.ToString();
             }
         }
-        public async Task<bool> GenerateSessionIdAsync()
+        protected async Task<bool> GenerateSessionIdAsync()
         {
             try
             {
@@ -65,7 +65,7 @@ namespace FritzBoxClient
                 throw new XmlException("Failed to parse xml page. Try a different fritzbox url.");
             }
         }
-        public HttpResponseMessage HttpRequestFritzBox(string relativeUrl, StringContent? bodyParameters, HttpRequestMethod method)
+        protected HttpResponseMessage HttpRequestFritzBox(string relativeUrl, StringContent? bodyParameters, HttpRequestMethod method)
         {
             using (var handler = new HttpClientHandler())
             {
@@ -89,6 +89,29 @@ namespace FritzBoxClient
                     throw new NotImplementedException("Only Get and Post methods are supported!");
                 }
             }
+        }
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                //If not valid, the sid gets automatically invalid
+                if (IsSidValid)
+                {
+                    var bodyParams = new StringContent($"xhr=1&sid={CurrentSid}&logout=1&no_sidrenew=1", Encoding.UTF8, "application/x-www-form-urlencoded");
+                    var response = HttpRequestFritzBox("/index.lua", bodyParams, HttpRequestMethod.Post);
+                    response.EnsureSuccessStatusCode();
+                }
+            }
+        }
+        ~BaseAccesser()
+        {
+            Dispose(false);
         }
     }
 }
