@@ -35,7 +35,7 @@ namespace FritzBoxClient.Models
         {
             if (reader.TokenType == JsonToken.String)
             {
-                var protocolStr = reader.Value.ToString();
+                var protocolStr = reader.Value!.ToString();
                 return new List<Protocol>
             {
                 protocolStr switch

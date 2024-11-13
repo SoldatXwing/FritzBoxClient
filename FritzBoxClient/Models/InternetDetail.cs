@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FritzBoxClient.Models
 {
-    public enum InternetDetail
+    public enum InternetState
     {
         Blocked,
         Unlimited

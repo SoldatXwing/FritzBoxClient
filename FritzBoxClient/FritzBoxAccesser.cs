@@ -50,12 +50,11 @@ public class FritzBoxAccesser : BaseAccesser
     /// </summary>
     /// <param name="devices">List of devices to resolve IP and UID for.</param>
     /// <returns>List of devices with updated IP and UID.</returns>
-    public async Task<List<Device>> ResolveIpsAndUidForDevices(List<Device> devices)
+    private async Task<List<Device>> ResolveIpsAndUidForDevices(List<Device> devices)
     {
         var response = await GetWifiRadioNetworkPageJsonAsync();
         JObject jsonObject = JObject.Parse(response);
         JToken knownWlanDevicesToken = jsonObject["data"]!["wlanSettings"]!["knownWlanDevices"]!;
-
         List<KnownWlanDevice> knownWlanDevices = knownWlanDevicesToken.ToObject<List<KnownWlanDevice>>()!;
         devices.ForEach(c =>
         {
@@ -85,15 +84,10 @@ public class FritzBoxAccesser : BaseAccesser
     /// <summary>
     /// Retrieves all active devices in the local network. 
     /// </summary>
-    /// <param name="getWithIpAndUid">Specifies if IP and UID should be included.</param>
     /// <returns>List of devices in the local network.</returns>
-    public async Task<List<Device>> GetAllDevciesInNetworkAsync(bool getWithIpAndUid = false)
-    {
-        var result = JsonConvert.DeserializeObject<FritzBoxResponse>(await GetOverViewPageJsonAsync())!.Data.Net.Devices!;
-        if (!getWithIpAndUid)
-            return result;
-        return await ResolveIpsAndUidForDevices(result);
-    }
+    public async Task<List<Device>> GetAllDevciesInNetworkAsync() => await ResolveIpsAndUidForDevices(
+        JsonConvert.DeserializeObject<FritzBoxResponse>(await GetOverViewPageJsonAsync())!.Data.Net.Devices!);
+
     /// <summary>
     /// Retrieves a single device by name.
     /// </summary>
@@ -139,7 +133,7 @@ public class FritzBoxAccesser : BaseAccesser
     /// <param name="dev">UID of the device.</param>
     /// <exception cref="NotImplementedException">Thrown if parameters are missing.</exception>
     /// <exception cref="ArgumentException">Thrown if IP address format is invalid.</exception>
-    public async Task ChangeInternetAccessStateForDeviceAsync(string devName, InternetDetail internetDetailState, IPAddress ipAdress, string dev)
+    public async Task ChangeInternetAccessStateForDeviceAsync(string devName, InternetState internetDetailState, IPAddress ipAdress, string dev)
     {
         if (string.IsNullOrEmpty(devName) ||
             string.IsNullOrEmpty(dev) ||
@@ -187,7 +181,7 @@ public class FritzBoxAccesser : BaseAccesser
     /// <param name="internetDetailState">New internet access state.</param>
     /// <exception cref="NotImplementedException">Thrown if parameters are missing.</exception>
     /// <exception cref="ArgumentException">Thrown if IP address format is invalid.</exception>
-    public async Task ChangeInternetAccessStateForDeviceAsync(Device device, InternetDetail internetDetailState)
+    public async Task ChangeInternetAccessStateForDeviceAsync(Device device, InternetState internetDetailState)
     {
         if (string.IsNullOrEmpty(device.Name) ||
             string.IsNullOrEmpty(device.Uid) ||
@@ -266,6 +260,7 @@ public class FritzBoxAccesser : BaseAccesser
         return JsonConvert.DeserializeObject<List<Port>>(JObject.Parse(await response.Content.ReadAsStringAsync())["data"]!["homenet"]!["services"]!
                                                                 .ToString())!;
     }
+
 
 }
 
