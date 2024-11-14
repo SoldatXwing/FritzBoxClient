@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using FritzBoxClient.Converter;
+using Newtonsoft.Json;
 using System.Net;
 
 public class Device

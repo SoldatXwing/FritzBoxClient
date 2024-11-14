@@ -3,19 +3,9 @@
     internal class FritzBoxAccesserTests
     {
         [Test]
-        public async Task GetAllDevicesInNetworkAsync_Success()
+        public async Task GetAllConnectedDevicesInNetworkAsync_Success()
         {
-            List<Device> devices = await SetUp.FritzBoxAccesser.GetAllDevciesInNetworkAsync();
-            Assert.Multiple(() =>
-            {
-                Assert.That(devices, Is.Not.Null);
-                Assert.That(devices.Count, Is.GreaterThan(0));
-            });
-        }
-        [Test]
-        public async Task GetAllDevicesInNetworkAsyncWithIpAndUid_Success()
-        {
-            List<Device> devices = await SetUp.FritzBoxAccesser.GetAllDevciesInNetworkAsync(true);
+            List<Device> devices = await SetUp.FritzBoxAccesser.GetAllConnectedDevciesInNetworkAsync();
             Assert.Multiple(() =>
             {
                 Assert.That(devices, Is.Not.Null);

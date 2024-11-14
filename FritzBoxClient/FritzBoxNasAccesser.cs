@@ -133,9 +133,7 @@ namespace FritzBoxClient
                 { new StringContent(""), "ResultScript" },
                 { fileContent, "UploadFile", fileName}
             };
-            var ts = await form.ReadAsStringAsync();
             var response = FormDataRequestFritzBox(relativeUrl, form, HttpRequestMethod.Post);
-            var t = await response.Content.ReadAsStringAsync();
             return response;
         }
         /// <summary>
@@ -143,7 +141,7 @@ namespace FritzBoxClient
         /// </summary>
         /// <param name="fileBytes">Byte array of the file to inspect.</param>
         /// <returns>A string representing the MIME type.</returns>
-        private string DetectMimeType(byte[] fileBytes)
+        private static string DetectMimeType(byte[] fileBytes)
         {
             if (fileBytes.Length > 0)
             {
@@ -165,24 +163,20 @@ namespace FritzBoxClient
         /// <param name="method">HTTP request method (only POST is supported).</param>
         /// <returns>A HttpResponseMessage indicating the result of the request.</returns>
         /// <exception cref="NotImplementedException">Thrown if a method other than POST is specified.</exception>
-        private HttpResponseMessage FormDataRequestFritzBox(string relativeUrl, MultipartFormDataContent? formData, HttpRequestMethod method)
+        private static HttpResponseMessage FormDataRequestFritzBox(string relativeUrl, MultipartFormDataContent? formData, HttpRequestMethod method)
         {
-            using (var handler = new HttpClientHandler())
-            {
-                handler.ServerCertificateCustomValidationCallback = (request, cert, chain, errors) => true;
+            using var handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = (request, cert, chain, errors) => true;
 
-                using (var httpClient = new HttpClient(handler) { BaseAddress = new Uri(FritzBoxUrl) })
-                {
-                    if (method is HttpRequestMethod.Post)
-                    {
-                        var response = httpClient.PostAsync(relativeUrl, formData)
-                            .GetAwaiter()
-                            .GetResult();
-                        return response;
-                    }
-                    throw new NotImplementedException("Only Post method is supported!");
-                }
+            using var httpClient = new HttpClient(handler) { BaseAddress = new Uri(FritzBoxUrl) };
+            if (method is HttpRequestMethod.Post)
+            {
+                var response = httpClient.PostAsync(relativeUrl, formData)
+                    .GetAwaiter()
+                    .GetResult();
+                return response;
             }
+            throw new NotImplementedException("Only Post method is supported!");
         }
 
     }

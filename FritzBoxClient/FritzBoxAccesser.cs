@@ -1,4 +1,5 @@
 ﻿using FritzBoxClient.Models;
+using FritzBoxClient.Models.EnergyModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
@@ -50,11 +51,10 @@ public class FritzBoxAccesser : BaseAccesser
     /// </summary>
     /// <param name="devices">List of devices to resolve IP and UID for.</param>
     /// <returns>List of devices with updated IP and UID.</returns>
-    private async Task<List<Device>> ResolveIpsAndUidForDevices(List<Device> devices)
+    private async Task<List<Device>> ResolveIpsAndUidForDevicesAsync(List<Device> devices)
     {
         var response = await GetWifiRadioNetworkPageJsonAsync();
-        JObject jsonObject = JObject.Parse(response);
-        JToken knownWlanDevicesToken = jsonObject["data"]!["wlanSettings"]!["knownWlanDevices"]!;
+        JToken knownWlanDevicesToken = JObject.Parse(response)["data"]!["wlanSettings"]!["knownWlanDevices"]!;
         List<KnownWlanDevice> knownWlanDevices = knownWlanDevicesToken.ToObject<List<KnownWlanDevice>>()!;
         devices.ForEach(c =>
         {
@@ -69,7 +69,8 @@ public class FritzBoxAccesser : BaseAccesser
             }
             catch (InvalidOperationException) //catches if more than 1 "known" device is found, and now search in the active ones
             {
-                var matchingDevice = knownWlanDevices.Where(c => c.Type == "active").SingleOrDefault(d => d.Name == c.Name);
+                var matchingDevice = knownWlanDevices.Where(c => c.Type == "active")
+                    .SingleOrDefault(d => d.Name == c.Name);
                 if (matchingDevice is not null)
                 {
                     c.Ip = IPAddress.Parse(matchingDevice.Ip);
@@ -82,10 +83,10 @@ public class FritzBoxAccesser : BaseAccesser
 
     }
     /// <summary>
-    /// Retrieves all active devices in the local network. 
+    /// Retrieves all connected devices in the local network. 
     /// </summary>
     /// <returns>List of devices in the local network.</returns>
-    public async Task<List<Device>> GetAllDevciesInNetworkAsync() => await ResolveIpsAndUidForDevices(
+    public async Task<List<Device>> GetAllConnectedDevciesInNetworkAsync() => await ResolveIpsAndUidForDevicesAsync(
         JsonConvert.DeserializeObject<FritzBoxResponse>(await GetOverViewPageJsonAsync())!.Data.Net.Devices!);
 
     /// <summary>
@@ -115,14 +116,25 @@ public class FritzBoxAccesser : BaseAccesser
 
     public async Task<Device> GetSingleDeviceAsync(IPAddress ip)
     {
-        var response = JObject.Parse(await GetWifiRadioNetworkPageJsonAsync());
-        var deviceJson = response["data"]?["wlanSettings"]?["knownWlanDevices"]
-                        ?.FirstOrDefault(d => d["ip"]?.ToString() == ip.ToString())
-                        ?.ToString();
+        var response = await GetWifiRadioNetworkPageJsonAsync();
+        var device = FindDeviceByIp(response, ip);
 
-        if (deviceJson is null)
-            throw new InvalidOperationException($"No Device with ip: {ip} found!");
-        return JsonConvert.DeserializeObject<Device>(deviceJson)!;
+        if (device == null)
+            throw new InvalidOperationException($"No device with IP: {ip} found.");
+
+        return device;
+    }
+
+    private static Device? FindDeviceByIp(string jsonResponse, IPAddress ip)
+    {
+        var response = JObject.Parse(jsonResponse);
+        var devices = response["data"]?["wlanSettings"]?["knownWlanDevices"];
+
+        var deviceJson = devices?.FirstOrDefault(d => d["ip"]?.ToString() == ip.ToString())?.ToString();
+
+        return deviceJson != null
+            ? JsonConvert.DeserializeObject<Device>(deviceJson)
+            : null;
     }
     /// <summary>
     /// Changes the internet access state for a specified device in the local network.
@@ -249,7 +261,7 @@ public class FritzBoxAccesser : BaseAccesser
     /// <exception cref="InvalidOperationException">
     /// Thrown when the response from the FritzBox indicates failure to retrieve the open ports.
     /// </exception>
-    public async Task<List<Port>> GetOpenPorts()
+    public async Task<List<Port>> GetOpenPortsAsync()
     {
         if (!IsSidValid)
             await GenerateSessionIdAsync();
@@ -260,7 +272,29 @@ public class FritzBoxAccesser : BaseAccesser
         return JsonConvert.DeserializeObject<List<Port>>(JObject.Parse(await response.Content.ReadAsStringAsync())["data"]!["homenet"]!["services"]!
                                                                 .ToString())!;
     }
-
+    /// <summary>
+    /// Returns all power consumers of the FritzBox, such as Wlan, DSL, and connected USB devices.
+    /// The first element in the list is most likely the main system of the FritzBox.
+    /// </summary>
+    /// <returns>   
+    /// A task representing the asynchronous operation. The task result is a list of <see cref="PowerConsumer"/> objects 
+    /// representing the power consumers (e.g., Wlan, DSL, USB devices).
+    /// </returns>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown if the request to retrieve power consumers fails (e.g., network error or invalid response).
+    /// </exception>
+    public async Task<List<PowerConsumer>> GetPowerConsumersAsync()
+    {
+        if (!IsSidValid)
+            await GenerateSessionIdAsync();
+        var content = new StringContent($"sid={CurrentSid}&page=energy", Encoding.UTF8, "application/x-www-form-urlencoded");
+        var response = HttpRequestFritzBox("/data.lua", content, HttpRequestMethod.Post);
+        if (!response.IsSuccessStatusCode)
+            throw new InvalidOperationException("Failed to recieve power consumers");
+        return JsonConvert.DeserializeObject<List<PowerConsumer>>(JObject.Parse(await response.Content.ReadAsStringAsync())["data"]!["drain"]!
+                                                                .ToString())!;
+    }
+    
 
 }
 
