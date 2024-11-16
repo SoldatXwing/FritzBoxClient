@@ -1,6 +1,8 @@
-﻿using FritzBoxClient.Models.NasModels;
+﻿using FritzBoxClient.Models.ErrorModels;
+using FritzBoxClient.Models.NasModels;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
+using FritzBoxClient.Exceptions.NasExceptions;
 using System.Text;
 namespace FritzBoxClient
 {
@@ -177,6 +179,38 @@ namespace FritzBoxClient
                 return response;
             }
             throw new NotImplementedException("Only Post method is supported!");
+        }
+        public async Task DeleteFiles(List<NasFile> files)
+        {
+            if (!files.Select(c => c.Path.StartsWith("/")).Any())
+                throw new InvalidOperationException(@"Path has to start with: ""/""");
+            if (!IsSidValid)
+                await GenerateSessionIdAsync();
+            var parameters = new StringBuilder();
+            parameters.Append($"sid={CurrentSid}&c=files&a=delete");
+
+            int index = 0;
+            foreach (var file in files)
+            {
+                parameters.Append($"&paths[{index}]={Uri.EscapeDataString(file.Path)}");
+                index++;
+            }
+
+            var content = new StringContent(parameters.ToString(), Encoding.UTF8, "application/x-www-form-urlencoded");
+            var response = HttpRequestFritzBox($"/nas/api/data.lua", content, HttpRequestMethod.Post);
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                var error = JsonConvert.DeserializeObject<ErrorResponse>(await response.Content.ReadAsStringAsync());
+                if (error?.Error != null)
+                {
+                    throw new FritzBoxFileSystemException(
+                        error.Error.Message,
+                        error.Error.Code,
+                        error.Error.Data?.Select(d => new FritzBoxFileErrorDetail(d.Path, d.Message, d.Code)).ToList()
+                            ?? new List<FritzBoxFileErrorDetail>()
+                    );
+                }
+            }   
         }
 
     }
