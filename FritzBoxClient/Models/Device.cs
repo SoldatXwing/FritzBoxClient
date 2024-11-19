@@ -23,7 +23,7 @@ public class Device
     public string Description { get; set; }
     [JsonProperty("ip")]
     [JsonConverter(typeof(IPAddressConverter))]
-    public IPAddress? Ip {  get; set; } = null;
+    public IPAddress? Ip { get; set; } = null;
     [JsonProperty("uid")]
     public string Uid { get; set; } = string.Empty;
 

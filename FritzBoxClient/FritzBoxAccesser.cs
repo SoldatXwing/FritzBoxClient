@@ -294,7 +294,7 @@ public class FritzBoxAccesser : BaseAccesser
         return JsonConvert.DeserializeObject<List<PowerConsumer>>(JObject.Parse(await response.Content.ReadAsStringAsync())["data"]!["drain"]!
                                                                 .ToString())!;
     }
-    
+   
 
 }
 

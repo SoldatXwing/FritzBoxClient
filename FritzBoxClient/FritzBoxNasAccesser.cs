@@ -1,8 +1,8 @@
-﻿using FritzBoxClient.Models.ErrorModels;
+﻿using FritzBoxClient.Exceptions.NasExceptions;
+using FritzBoxClient.Models.ErrorModels;
 using FritzBoxClient.Models.NasModels;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
-using FritzBoxClient.Exceptions.NasExceptions;
 using System.Text;
 namespace FritzBoxClient
 {
@@ -105,9 +105,18 @@ namespace FritzBoxClient
             if (!IsSidValid)
                 await GenerateSessionIdAsync();
             var response = HttpRequestFritzBox($"/nas/api/data.lua?c=pictures&a=get&sid={CurrentSid}&path={path}", null, HttpRequestMethod.Get);
+
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadAsByteArrayAsync();
-            throw new InvalidOperationException("Failed to get file bytes");
+
+            var error = JsonConvert.DeserializeObject<ErrorResponse>(await response.Content.ReadAsStringAsync());
+            throw new FritzBoxFileSystemException(
+                error!.Error.Message,
+                error.Error.Code,
+                error.Error.Data?.Select(d => new FritzBoxFileErrorDetail(d.Path, d.Message, d.Code)).ToList()
+                    ?? new List<FritzBoxFileErrorDetail>()
+            );
+
         }
         /// <summary>
         /// Uploads a file to the NAS at the specified path.
@@ -210,7 +219,7 @@ namespace FritzBoxClient
                             ?? new List<FritzBoxFileErrorDetail>()
                     );
                 }
-            }   
+            }
         }
 
     }

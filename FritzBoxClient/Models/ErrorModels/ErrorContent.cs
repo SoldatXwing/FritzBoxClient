@@ -9,7 +9,7 @@ namespace FritzBoxClient.Models.ErrorModels
         public string Message { get; set; }
 
         [JsonProperty("data")]
-        [JsonConverter(typeof(ErrorDataConverter))] 
+        [JsonConverter(typeof(ErrorDataConverter))]
         public List<ErrorData> Data { get; set; }
 
         [JsonProperty("code")]

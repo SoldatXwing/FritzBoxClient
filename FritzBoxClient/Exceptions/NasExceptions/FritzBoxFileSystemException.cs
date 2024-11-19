@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FritzBoxClient.Exceptions.NasExceptions
+﻿namespace FritzBoxClient.Exceptions.NasExceptions
 {
     public class FritzBoxFileSystemException : Exception
     {
