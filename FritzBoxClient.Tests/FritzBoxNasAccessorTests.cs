@@ -1,26 +1,26 @@
 ﻿using FritzBoxClient.Exceptions.NasExceptions;
 namespace FritzBoxApi.Tests
 {
-    internal class FritzBoxNasAccesserTests
+    internal class FritzBoxNasAccessorTests
     {
         //No specific tests are possible because the NAS systems are constructed differently
         [Test]
         public async Task GetNasBaseStorageDiskInfo_Success()
         {
-            var result = await SetUp.NasAccesser!.GetNasStorageDiskInfoAsync();
+            var result = await SetUp.NasAccessor!.GetNasStorageDiskInfoAsync();
             Assert.That(result, Is.Not.Null);
         }
         [Test]
         public async Task GetNasBaseFoldersAsync_Success()
         {
-            var result = await SetUp.NasAccesser!.GetNasFoldersAsync();
+            var result = await SetUp.NasAccessor!.GetNasFoldersAsync();
             Assert.That(result, Is.Not.Null);
         }
         [Test]
         public void GetNasFileBytes_WrongPath()
         {
             string invalidPath = "/huhuh/se.jpg";
-            var exception = Assert.ThrowsAsync<FritzBoxFileSystemException>(async () => await SetUp.NasAccesser!.GetNasFileBytes(invalidPath));
+            var exception = Assert.ThrowsAsync<FritzBoxFileSystemException>(async () => await SetUp.NasAccessor!.GetNasFileBytes(invalidPath));
 
             Assert.Multiple(() =>
             {
@@ -34,7 +34,7 @@ namespace FritzBoxApi.Tests
         public void DeleteNasFile_InvalidPath()
         {
             var exception = Assert.ThrowsAsync<FritzBoxFileSystemException>(async () =>
-                await SetUp.NasAccesser!.DeleteFiles(new List<FritzBoxClient.Models.NasModels.NasFile> { new() { Path = "/this/is/invalid/path/to/file.png" } }));
+                await SetUp.NasAccessor!.DeleteFiles(new List<FritzBoxClient.Models.NasModels.NasFile> { new() { Path = "/this/is/invalid/path/to/file.png" } }));
             Assert.Multiple(() =>
             {
                 Assert.That(exception, Is.Not.Null);

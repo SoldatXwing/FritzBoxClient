@@ -5,7 +5,7 @@ using System.Xml.Linq;
 
 namespace FritzBoxClient
 {
-    public abstract class BaseAccesser : IDisposable
+    public abstract class BaseAccessor : IDisposable
     {
         protected string CurrentSid { get; set; } = null!;
         protected DateTime SidTimestamp { get; set; }
@@ -102,7 +102,7 @@ namespace FritzBoxClient
                 }
             }
         }
-        ~BaseAccesser()
+        ~BaseAccessor()
         {
             Dispose(false);
         }

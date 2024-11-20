@@ -6,8 +6,8 @@ namespace FritzBoxApi.Tests
     [SetUpFixture]
     internal class SetUp
     {
-        public static FritzBoxAccesser? FritzBoxAccesser { get; private set; }
-        public static FritzBoxNasAccesser? NasAccesser { get; private set; }
+        public static FritzBoxAccessor? FritzBoxAccessor { get; private set; }
+        public static FritzBoxNasAccessor? NasAccessor { get; private set; }
         public static IConfiguration Config { get; }
         static SetUp()
         {
@@ -27,14 +27,14 @@ namespace FritzBoxApi.Tests
             if (string.IsNullOrEmpty(password))
                 throw new InvalidOperationException("Password is not present in AppSettings!");
 
-            FritzBoxAccesser = new FritzBoxAccesser(password, fritzBoxUrl, fritzUserName);
-            NasAccesser = new FritzBoxNasAccesser(password, fritzBoxUrl, fritzUserName);
+            FritzBoxAccessor = new FritzBoxAccessor(password, fritzBoxUrl, fritzUserName);
+            NasAccessor = new FritzBoxNasAccessor(password, fritzBoxUrl, fritzUserName);
         }
         [OneTimeTearDown]
         public void TearDown()
         {
-            FritzBoxAccesser?.Dispose();
-            NasAccesser?.Dispose();
+            FritzBoxAccessor?.Dispose();
+            NasAccessor?.Dispose();
         }
     }
 }

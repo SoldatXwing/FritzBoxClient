@@ -9,15 +9,15 @@ namespace FritzBoxClient
     /// <summary>
     /// Provides access to NAS storage on a FritzBox router, allowing for file retrieval, storage information access, and file uploads.
     /// </summary>
-    public class FritzBoxNasAccesser : BaseAccesser
+    public class FritzBoxNasAccessor : BaseAccessor
     {
         /// <summary>
-        /// Initializes a new instance of the FritzBoxNasAccesser with specified FritzBox credentials.
+        /// Initializes a new instance of the FritzBoxNasAccessor with specified FritzBox credentials.
         /// </summary>
         /// <param name="fritzBoxPassword">Password for FritzBox login.</param>
         /// <param name="fritzBoxUrl">URL of the FritzBox (default is https://fritz.box).</param>
         /// <param name="userName">Username for FritzBox login (optional).</param>
-        public FritzBoxNasAccesser(string fritzBoxPassword, string fritzBoxUrl = "https://fritz.box", string userName = "") => (FritzBoxUrl, Password, FritzUserName) = (fritzBoxUrl, fritzBoxPassword, userName);
+        public FritzBoxNasAccessor(string fritzBoxPassword, string fritzBoxUrl = "https://fritz.box", string userName = "") => (FritzBoxUrl, Password, FritzUserName) = (fritzBoxUrl, fritzBoxPassword, userName);
         /// <summary>
         /// Gets disk information of the NAS storage at the specified path.
         /// </summary>

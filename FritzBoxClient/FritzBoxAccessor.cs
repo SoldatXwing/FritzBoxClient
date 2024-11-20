@@ -7,15 +7,15 @@ using System.Text;
 namespace FritzBoxClient;
 
 
-public class FritzBoxAccesser : BaseAccesser
+public class FritzBoxAccessor : BaseAccessor
 {
     /// <summary>
-    /// Initializes a new instance of the FritzBoxAccesser with specified credentials.
+    /// Initializes a new instance of the FritzBoxAccessor with specified credentials.
     /// </summary>
     /// <param name="fritzBoxPassword">Password for FritzBox login.</param>
     /// <param name="fritzBoxUrl">URL of the FritzBox (default is "https://fritz.box").</param>
     /// <param name="userName">Username for FritzBox login.</param>
-    public FritzBoxAccesser(string fritzBoxPassword, string fritzBoxUrl = "https://fritz.box", string userName = "") => (FritzBoxUrl, Password, FritzUserName) = (EnsureUrlHasScheme(fritzBoxUrl), fritzBoxPassword, userName);
+    public FritzBoxAccessor(string fritzBoxPassword, string fritzBoxUrl = "https://fritz.box", string userName = "") => (FritzBoxUrl, Password, FritzUserName) = (EnsureUrlHasScheme(fritzBoxUrl), fritzBoxPassword, userName);
     /// <summary>
     /// Checks if the given URL starts with "http://" or "https://".
     /// If not, "https://" is added by default.

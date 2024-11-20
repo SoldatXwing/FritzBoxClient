@@ -2,12 +2,12 @@
 
 namespace FritzBoxApi.Tests
 {
-    internal class FritzBoxAccesserTests
+    internal class FritzBoxAccessorTests
     {
         [Test]
         public async Task GetAllConnectedDevicesInNetworkAsync_Success()
         {
-            List<Device> devices = await SetUp.FritzBoxAccesser!.GetAllConnectedDevciesInNetworkAsync();
+            List<Device> devices = await SetUp.FritzBoxAccessor!.GetAllConnectedDevciesInNetworkAsync();
             Assert.Multiple(() =>
             {
                 Assert.That(devices, Is.Not.Null);
@@ -18,7 +18,7 @@ namespace FritzBoxApi.Tests
         public void ChangeInternetAccessState_EmptyParameters()
         {
             var exception = Assert.ThrowsAsync<NotImplementedException>(async () =>
-                await SetUp.FritzBoxAccesser!.ChangeInternetAccessStateForDeviceAsync(
+                await SetUp.FritzBoxAccessor!.ChangeInternetAccessStateForDeviceAsync(
                     "",
                     FritzBoxClient.Models.InternetState.Unlimited,
                     new System.Net.IPAddress(new byte[] { 2, 2, 2, 2 }),
@@ -35,7 +35,7 @@ namespace FritzBoxApi.Tests
         [Test]
         public async Task GetPowerConsumer_Success()
         {
-            List<PowerConsumer> powerConsumers = await SetUp.FritzBoxAccesser!.GetPowerConsumersAsync();
+            List<PowerConsumer> powerConsumers = await SetUp.FritzBoxAccessor!.GetPowerConsumersAsync();
             Assert.Multiple(() =>
             {
                 Assert.That(powerConsumers, Is.Not.Null);
