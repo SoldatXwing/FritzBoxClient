@@ -16,20 +16,18 @@ namespace FritzBoxClient
         protected static string FritzBoxUrl = string.Empty;
         protected string Password = string.Empty;
         protected string FritzUserName = string.Empty;
-        protected string CalculateMD5(string input)
+        protected static string CalculateMD5(string input)
         {
-            using (MD5 md5 = MD5.Create())
-            {
-                byte[] inputBytes = Encoding.Unicode.GetBytes(input);
-                byte[] hashBytes = md5.ComputeHash(inputBytes);
+            using MD5 md5 = MD5.Create();
+            byte[] inputBytes = Encoding.Unicode.GetBytes(input);
+            byte[] hashBytes = md5.ComputeHash(inputBytes);
 
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < hashBytes.Length; i++)
-                {
-                    sb.Append(hashBytes[i].ToString("x2"));
-                }
-                return sb.ToString();
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < hashBytes.Length; i++)
+            {
+                sb.Append(hashBytes[i].ToString("x2"));
             }
+            return sb.ToString();
         }
         protected async Task<bool> GenerateSessionIdAsync()
         {
@@ -64,30 +62,26 @@ namespace FritzBoxClient
                 throw new XmlException("Failed to parse xml page. Try a different fritzbox url.");
             }
         }
-        protected HttpResponseMessage HttpRequestFritzBox(string relativeUrl, StringContent? bodyParameters, HttpRequestMethod method)
+        protected static HttpResponseMessage HttpRequestFritzBox(string relativeUrl, StringContent? bodyParameters, HttpRequestMethod method)
         {
-            using (var handler = new HttpClientHandler())
+            using var handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = (request, cert, chain, errors) => true;
+            using var httpClient = new HttpClient(handler) { BaseAddress = new Uri(FritzBoxUrl) };
+            if (method is HttpRequestMethod.Post)
             {
-                handler.ServerCertificateCustomValidationCallback = (request, cert, chain, errors) => true;
-                using (var httpClient = new HttpClient(handler) { BaseAddress = new Uri(FritzBoxUrl) })
-                {
-                    if (method is HttpRequestMethod.Post)
-                    {
-                        var response = httpClient.PostAsync(relativeUrl, bodyParameters)
-                            .GetAwaiter()
-                            .GetResult();
-                        return response;
-                    }
-                    else if (method is HttpRequestMethod.Get)
-                    {
-                        var response = httpClient.GetAsync(relativeUrl)
-                            .GetAwaiter()
-                            .GetResult();
-                        return response;
-                    }
-                    throw new NotImplementedException("Only Get and Post methods are supported!");
-                }
+                var response = httpClient.PostAsync(relativeUrl, bodyParameters)
+                    .GetAwaiter()
+                    .GetResult();
+                return response;
             }
+            else if (method is HttpRequestMethod.Get)
+            {
+                var response = httpClient.GetAsync(relativeUrl)
+                    .GetAwaiter()
+                    .GetResult();
+                return response;
+            }
+            throw new NotImplementedException("Only Get and Post methods are supported!");
         }
         public void Dispose()
         {

@@ -15,7 +15,21 @@ public class FritzBoxAccesser : BaseAccesser
     /// <param name="fritzBoxPassword">Password for FritzBox login.</param>
     /// <param name="fritzBoxUrl">URL of the FritzBox (default is "https://fritz.box").</param>
     /// <param name="userName">Username for FritzBox login.</param>
-    public FritzBoxAccesser(string fritzBoxPassword, string fritzBoxUrl = "https://fritz.box", string userName = "") => (FritzBoxUrl, Password, FritzUserName) = (fritzBoxUrl, fritzBoxPassword, userName);
+    public FritzBoxAccesser(string fritzBoxPassword, string fritzBoxUrl = "https://fritz.box", string userName = "") => (FritzBoxUrl, Password, FritzUserName) = (EnsureUrlHasScheme(fritzBoxUrl), fritzBoxPassword, userName);
+    /// <summary>
+    /// Checks if the given URL starts with "http://" or "https://".
+    /// If not, "https://" is added by default.
+    /// </summary>
+    /// <param name="url">The URL to validate and adjust if necessary.</param>
+    /// <returns>The corrected URL with a valid scheme.</returns>
+    private static string EnsureUrlHasScheme(string url)
+    {
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+        {
+            return "https://" + url.TrimStart('/');
+        }
+        return url;
+    }
     /// <summary>
     /// Retrieves the JSON for the FritzBox overview page.
     /// </summary>
