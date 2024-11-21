@@ -12,7 +12,7 @@
 ```csharp
 using FritzBoxClient;
 
-using FritzBoxAccessor accessor = new ("password");
+using FritzBoxAccessor accessor = await FritzBoxAccessor.CreateAsync("password");
 var devices = await accessor.GetAllConnectedDevciesInNetworkAsync();
 
 foreach (var device in devices)
@@ -22,7 +22,7 @@ foreach (var device in devices)
 
 <span>Specify more details for the access:</span>
 ```csharp
-FritzBoxAccessor fritzBoxAccessor = new FritzBoxAccessor(fritzBoxPassword: "password", fritzBoxUrl: "https://192.168.178.1", userName: "fritz3000");
+FritzBoxAccessor fritzBoxAccessor = await FritzBoxAccessor.CreateAsync(fritzBoxPassword: "password", fritzBoxUrl: "https://192.168.178.1", userName: "fritz3000");
 ```
 <br/>
 <span>
@@ -33,7 +33,7 @@ FritzBoxAccessor fritzBoxAccessor = new FritzBoxAccessor(fritzBoxPassword: "pass
 using FritzBoxClient;
 using FritzBoxClient.Models;
 
-using FritzBoxAccessor accessor = new(fritzBoxPassword: "password");
+using FritzBoxAccessor accessor = await FritzBoxAccessor.CreateAsync(fritzBoxPassword: "password");
 var device = await accessor.GetSingleDeviceAsync(deviceName: "DESKTOP123");
 
 await accessor.ChangeInternetAccessStateForDeviceAsync(device, InternetState.Blocked);
@@ -47,9 +47,10 @@ await accessor.ChangeInternetAccessStateForDeviceAsync(device, InternetState.Blo
 ```csharp
 using FritzBoxClient;
 
-using FritzBoxNasAccessor nasAccessor = new(fritzBoxPassword: "password", fritzBoxUrl: "https://192.168.178.1");
+using FritzBoxNasAccessor nasAccessor = await FritzBoxNasAccessor.CreateAsync(fritzBoxPassword: "password", fritzBoxUrl: "https://192.168.178.1");
 var diskInformation = await nasAccessor.GetNasStorageDiskInfoAsync(path: "/Files/");
-Console.WriteLine($"Total storage: {diskInformation.TotalInMb}Mb, free storage: {diskInformation.FreeInMb}Mb, used storage: {diskInformation.UsedInMb}Mb");
+
+Console.WriteLine($"Total storage: {diskInformation.TotalInMb}Mb, free storage: {diskInformation.FreeInMb}Mb, used storage: {diskInformation.UsedInMb}Mb");****
 
 ```
 <span>To get the bytes of a file, do the following:</span>
