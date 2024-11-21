@@ -5,7 +5,7 @@
 <span>
     This wrapper does not use either the TR-064 or the AHA-HTTP interface. It uses the "proprietary" API of the Fritzbox. Due to the lack of official API documentation (as of 2024), I had to figure out the endpoints myself, test them, and implement them in the client.
 </span>
-<h2>FritzBoxAcesser usage</h2>
+<h2>FritzBoxAccessor usage</h2>
 <span>This simple approach shows how to initialize the FritzBoxAccessor and get the devices from the FritzBox.</span>
 <br/><br/>
 
@@ -39,7 +39,7 @@ var device = await accessor.GetSingleDeviceAsync(deviceName: "DESKTOP123");
 await accessor.ChangeInternetAccessStateForDeviceAsync(device, InternetState.Blocked);
 
 ```
-<h2>FritzBoxNasAcesser usage</h2>
+<h2>FritzBoxNasAccessor usage</h2>
 <span>This simple approach shows how to initialize the FritzBoxNasAccessor and get the NAS storage disk information.</span>
 <br/><br/>
 
