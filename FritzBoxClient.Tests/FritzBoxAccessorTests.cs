@@ -1,6 +1,6 @@
 ﻿using FritzBoxClient.Models.EnergyModels;
 
-namespace FritzBoxApi.Tests
+namespace FritzBoxClient.Tests
 {
     internal class FritzBoxAccessorTests
     {

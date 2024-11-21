@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using Newtonsoft.Json.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
@@ -7,6 +8,9 @@ namespace FritzBoxClient
 {
     public abstract class BaseAccessor : IDisposable
     {
+        public string FritzModel { get; protected set; }
+        public string FritzOsVersion { get; protected set; }
+        public double PowerConsumptionPercentage { get; protected set; }
         protected string CurrentSid { get; set; } = null!;
         protected DateTime SidTimestamp { get; set; }
         protected bool IsSidValid
@@ -16,6 +20,32 @@ namespace FritzBoxClient
         protected static string FritzBoxUrl = string.Empty;
         protected string Password = string.Empty;
         protected string FritzUserName = string.Empty;
+        /// <summary>
+        /// Checks if the given URL starts with "http://" or "https://".
+        /// If not, "https://" is added by default.
+        /// </summary>
+        /// <param name="url">The URL to validate and adjust if necessary.</param>
+        /// <returns>The corrected URL with a valid scheme.</returns>
+        protected static string EnsureUrlHasScheme(string url)
+        {
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+            {
+                return "https://" + url.TrimStart('/');
+            }
+            return url;
+        }
+        protected async Task InitializeAsync()
+        {
+            if (!IsSidValid)
+                await GenerateSessionIdAsync();
+            var content = new StringContent($"&sid={CurrentSid}&page=overview", Encoding.UTF8, "application/x-www-form-urlencoded");
+            var response = HttpRequestFritzBox("/data.lua", content, HttpRequestMethod.Post);
+            var json = JObject.Parse(await response.Content.ReadAsStringAsync());
+            FritzOsVersion = json["data"]!["fritzos"]!["nspver"]!.ToObject<string>()!;
+            FritzModel = json["data"]!["fritzos"]!["Productname"]!.ToObject<string>()!;
+            PowerConsumptionPercentage = json["data"]!["fritzos"]!["energy"]!.ToObject<double>()!;
+
+        }
         protected static string CalculateMD5(string input)
         {
             using MD5 md5 = MD5.Create();
@@ -46,8 +76,7 @@ namespace FritzBoxClient
                 var content = new StringContent($"response={challenge}-{responseHash}&username={FritzUserName}&lp=overview&loginView=simple", Encoding.UTF8, "application/x-www-form-urlencoded");
 
                 var loginResponse = HttpRequestFritzBox("/login_sid.lua", content, HttpRequestMethod.Post);
-                var loginResponseContent = await loginResponse.Content.ReadAsStringAsync();
-                var loginXml = XDocument.Parse(loginResponseContent);
+                var loginXml = XDocument.Parse(await loginResponse.Content.ReadAsStringAsync());
                 var loginSid = loginXml.Root!.Element("SID")!.Value;
 
                 if (loginSid == "0000000000000000")

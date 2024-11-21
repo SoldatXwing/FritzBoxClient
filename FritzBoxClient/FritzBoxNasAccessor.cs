@@ -2,6 +2,7 @@
 using FritzBoxClient.Models.ErrorModels;
 using FritzBoxClient.Models.NasModels;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 namespace FritzBoxClient
@@ -17,7 +18,16 @@ namespace FritzBoxClient
         /// <param name="fritzBoxPassword">Password for FritzBox login.</param>
         /// <param name="fritzBoxUrl">URL of the FritzBox (default is https://fritz.box).</param>
         /// <param name="userName">Username for FritzBox login (optional).</param>
-        public FritzBoxNasAccessor(string fritzBoxPassword, string fritzBoxUrl = "https://fritz.box", string userName = "") => (FritzBoxUrl, Password, FritzUserName) = (fritzBoxUrl, fritzBoxPassword, userName);
+        private FritzBoxNasAccessor(string fritzBoxPassword, string fritzBoxUrl, string userName) => (FritzBoxUrl, Password, FritzUserName) = (EnsureUrlHasScheme(fritzBoxUrl), fritzBoxPassword, userName);
+
+        public static async Task<FritzBoxNasAccessor> CreateAsync(string fritzBoxPassword, string fritzBoxUrl = "https://fritz.box", string userName = "")
+        {
+            FritzBoxNasAccessor accessor = new(fritzBoxPassword, EnsureUrlHasScheme(fritzBoxUrl), userName);
+            await accessor.InitializeAsync();
+            return accessor;
+
+        }
+
         /// <summary>
         /// Gets disk information of the NAS storage at the specified path.
         /// </summary>
@@ -223,6 +233,5 @@ namespace FritzBoxClient
         }
 
     }
-
-}
+ }
 

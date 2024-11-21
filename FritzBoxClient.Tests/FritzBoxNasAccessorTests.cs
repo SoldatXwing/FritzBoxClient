@@ -1,5 +1,5 @@
 ﻿using FritzBoxClient.Exceptions.NasExceptions;
-namespace FritzBoxApi.Tests
+namespace FritzBoxClient.Tests
 {
     internal class FritzBoxNasAccessorTests
     {

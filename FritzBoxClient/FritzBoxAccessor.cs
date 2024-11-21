@@ -15,21 +15,15 @@ public class FritzBoxAccessor : BaseAccessor
     /// <param name="fritzBoxPassword">Password for FritzBox login.</param>
     /// <param name="fritzBoxUrl">URL of the FritzBox (default is "https://fritz.box").</param>
     /// <param name="userName">Username for FritzBox login.</param>
-    public FritzBoxAccessor(string fritzBoxPassword, string fritzBoxUrl = "https://fritz.box", string userName = "") => (FritzBoxUrl, Password, FritzUserName) = (EnsureUrlHasScheme(fritzBoxUrl), fritzBoxPassword, userName);
-    /// <summary>
-    /// Checks if the given URL starts with "http://" or "https://".
-    /// If not, "https://" is added by default.
-    /// </summary>
-    /// <param name="url">The URL to validate and adjust if necessary.</param>
-    /// <returns>The corrected URL with a valid scheme.</returns>
-    private static string EnsureUrlHasScheme(string url)
+    private FritzBoxAccessor(string fritzBoxPassword, string fritzBoxUrl, string userName) => (FritzBoxUrl, Password, FritzUserName) = (EnsureUrlHasScheme(fritzBoxUrl), fritzBoxPassword, userName);
+    public static async Task<FritzBoxAccessor> CreateAsync(string fritzBoxPassword, string fritzBoxUrl = "https://fritz.box", string userName = "")
     {
-        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
-        {
-            return "https://" + url.TrimStart('/');
-        }
-        return url;
+        FritzBoxAccessor accessor = new(fritzBoxPassword, EnsureUrlHasScheme(fritzBoxUrl), userName);
+        await accessor.InitializeAsync();
+        return accessor;
+
     }
+
     /// <summary>
     /// Retrieves the JSON for the FritzBox overview page.
     /// </summary>
@@ -308,7 +302,6 @@ public class FritzBoxAccessor : BaseAccessor
         return JsonConvert.DeserializeObject<List<PowerConsumer>>(JObject.Parse(await response.Content.ReadAsStringAsync())["data"]!["drain"]!
                                                                 .ToString())!;
     }
-   
 
 }
 

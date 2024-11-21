@@ -1,7 +1,7 @@
 ﻿using FritzBoxClient;
 using Microsoft.Extensions.Configuration;
 
-namespace FritzBoxApi.Tests
+namespace FritzBoxClient.Tests
 {
     [SetUpFixture]
     internal class SetUp
@@ -17,7 +17,7 @@ namespace FritzBoxApi.Tests
                         .Build();
         }
         [OneTimeSetUp]
-        public void SetUpAsync()
+        public async Task SetUpAsync()
         {
             IConfigurationSection fritzBoxConfig = Config.GetSection("fritzBox");
             string password = fritzBoxConfig["password"]!;
@@ -27,8 +27,8 @@ namespace FritzBoxApi.Tests
             if (string.IsNullOrEmpty(password))
                 throw new InvalidOperationException("Password is not present in AppSettings!");
 
-            FritzBoxAccessor = new FritzBoxAccessor(password, fritzBoxUrl, fritzUserName);
-            NasAccessor = new FritzBoxNasAccessor(password, fritzBoxUrl, fritzUserName);
+            FritzBoxAccessor = await FritzBoxAccessor.CreateAsync(password, fritzBoxUrl, fritzUserName);
+            NasAccessor = await FritzBoxNasAccessor.CreateAsync(password, fritzBoxUrl, fritzUserName);
         }
         [OneTimeTearDown]
         public void TearDown()
