@@ -4,10 +4,31 @@
     <OutputType>Library</OutputType>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <Nullable>enable</Nullable>	  
   </PropertyGroup>
+	<PropertyGroup>
+		<PackageId>SoldatXwing.FritzBoxClient</PackageId>
+		<Version>1.0.1</Version>
+		<Author>SoldatXwing</Author>
+		<Product>FritzBoxClient</Product>
+		<Description>A client to interact with the local Fritz!Box router, enabling management and retrieval of network settings, device information, and configuration through its API. </Description>
+		<PackageTags>FritzBox;LocalNetwork;API;C#;JSON</PackageTags>
+		<RepositoryUrl>https://github.com/SoldatXwing/FritzBoxClient</RepositoryUrl>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\README.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
