@@ -6,6 +6,10 @@ This simple client library logs in to your local FRITZ!Box using the provided pa
 
 This wrapper does not use either the TR-064 or the AHA-HTTP interface. It uses the "proprietary" API of the Fritzbox. Due to the lack of official API documentation (as of 2024), I had to figure out the endpoints myself, test them, and implement them in the client.
 
+## Download sources:
+- [![NuGet](https://img.shields.io/badge/NuGet-Package-blue)](https://www.nuget.org/packages/SoldatXwing.FritzBoxClient)
+- [![GitHub](https://img.shields.io/badge/GitHub-Releases-black)](https://github.com/SoldatXwing/FritzBoxClient/releases)
+
 ## FritzBoxAccessor Usage
 
 This simple approach shows how to initialize the `FritzBoxAccessor` and get the devices from the FritzBox:
