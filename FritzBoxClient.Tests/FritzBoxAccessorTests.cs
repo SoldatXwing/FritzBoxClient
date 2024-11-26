@@ -42,5 +42,15 @@ namespace FritzBoxClient.Tests
                 Assert.That(powerConsumers, Is.Not.Empty); // Atleast the fritzbox itself is a power consumer
             });
         }
+        [Test]
+        public async Task GetWifiPassword_Success()
+        {
+            var password = await SetUp.FritzBoxAccessor!.GetWiFiPasswordAsync();
+            Assert.Multiple(() =>
+            {
+                Assert.That(password, Is.Not.Null);
+                Assert.That(password, Is.Not.Empty);
+            });
+        }
     }
 }

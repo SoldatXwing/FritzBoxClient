@@ -33,7 +33,7 @@ public class FritzBoxAccessor : BaseAccessor
     {
         if (!IsSidValid)
             await GenerateSessionIdAsync();
-        var content = new StringContent($"xhr=1&sid={CurrentSid}&lang=de&page=overview&xhrId=all&useajax=1&no_sidrenew=", Encoding.UTF8, "application/x-www-form-urlencoded");
+        var content = new StringContent($"&sid={CurrentSid}&page=wset", Encoding.UTF8, "application/x-www-form-urlencoded");
         var response = HttpRequestFritzBox("/data.lua", content, HttpRequestMethod.Post);
         if (response.IsSuccessStatusCode)
             return await response.Content.ReadAsStringAsync();
@@ -96,6 +96,12 @@ public class FritzBoxAccessor : BaseAccessor
     /// <returns>List of devices in the local network.</returns>
     public async Task<List<Device>> GetAllConnectedDevciesInNetworkAsync() => await ResolveIpsAndUidForDevicesAsync(
         JsonConvert.DeserializeObject<FritzBoxResponse>(await GetOverViewPageJsonAsync())!.Data.Net.Devices!);
+    /// <summary>
+    /// Retrieves the WiFi password from the router settings.
+    /// </summary>
+    /// <returns>The WiFi password as a string.</returns>
+    public async Task<string> GetWiFiPasswordAsync() => JObject.Parse(await GetWifiRadioNetworkPageJsonAsync())!["data"]!["wlanSettings"]!["psk"]!.ToObject<string>()! ?? throw new InvalidOperationException("WiFi password could not be retrieved.");
+
 
     /// <summary>
     /// Retrieves a single device by name.
