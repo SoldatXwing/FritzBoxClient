@@ -10,6 +10,12 @@ This wrapper does not use either the TR-064 or the AHA-HTTP interface. It uses t
 - [![NuGet](https://img.shields.io/badge/NuGet-Package-blue)](https://www.nuget.org/packages/SoldatXwing.FritzBoxClient)
 - [![GitHub](https://img.shields.io/badge/GitHub-Releases-black)](https://github.com/SoldatXwing/FritzBoxClient/releases)
 
+## Compatibality
+- [v.1.0.0](https://github.com/SoldatXwing/FritzBoxClient/releases/tag/v1.0.0) 
+    - Fully compatible with FritzOs versions < 8.0 and > 7.0
+    - Partially compatible with FritzOs version 8.x
+- v1.1.0
+    - Currently working on 
 ## FritzBoxAccessor Usage
 
 This simple approach shows how to initialize the `FritzBoxAccessor` and get the devices from the FritzBox:
