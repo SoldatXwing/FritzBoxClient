@@ -59,3 +59,5 @@ byte[] fileBytes = await nasAccessor.GetNasFileBytes("/path/to/file.png");
 ```
 ## Disclaimer
 This tool is only for testing and academic purposes and can only be used where strict consent has been given. Do not use it for illegal purposes! It is the end user’s responsibility to obey all applicable local, state, and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this tool and software in general.
+
+This project is not affiliated with, endorsed by, or sponsored by AVM GmbH. "AVM," "FRITZ!," and "FRITZ!Box" are trademarks of AVM GmbH, used here solely to indicate compatibility. No AVM logos, designs, or graphical elements are included. Use this project responsibly and in compliance with AVM's guidelines. AVM assumes no liability for this project.
