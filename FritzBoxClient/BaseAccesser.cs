@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
@@ -8,10 +9,11 @@ namespace FritzBoxClient
 {
     public abstract class BaseAccessor : IDisposable
     {
+        protected List<Models.NewApiModels.Device>? Devices { get; set; }
         public string FritzModel { get; protected set; }
         public string FritzOsVersion { get; protected set; }
         public double PowerConsumptionPercentage { get; protected set; }
-        protected string CurrentSid { get; set; } = null!;
+        protected static string CurrentSid { get; set; } = null!;
         protected DateTime SidTimestamp { get; set; }
         protected bool IsSidValid
         {
@@ -44,8 +46,9 @@ namespace FritzBoxClient
             FritzOsVersion = json["data"]!["fritzos"]!["nspver"]!.ToObject<string>()!;
             FritzModel = json["data"]!["fritzos"]!["Productname"]!.ToObject<string>()!;
             PowerConsumptionPercentage = json["data"]!["fritzos"]!["energy"]!.ToObject<double>()!;
-
         }
+        protected async Task UpdateDeviceListAsync() => Devices = JsonConvert.DeserializeObject<List<Models.NewApiModels.Device>>(JObject.Parse(await HttpRequestFritzBox("api/v0/landevice", null, HttpRequestMethod.Get).Content.ReadAsStringAsync())["landevice"]!.ToString());
+
         protected static string CalculateMD5(string input)
         {
             using MD5 md5 = MD5.Create();
@@ -96,6 +99,8 @@ namespace FritzBoxClient
             using var handler = new HttpClientHandler();
             handler.ServerCertificateCustomValidationCallback = (request, cert, chain, errors) => true;
             using var httpClient = new HttpClient(handler) { BaseAddress = new Uri(FritzBoxUrl) };
+            if(CurrentSid is not null)
+                httpClient.DefaultRequestHeaders.Add("AUTHORIZATION", "AVM-SID " + CurrentSid); // Needed for api routes /api/v0/...
             if (method is HttpRequestMethod.Post)
             {
                 var response = httpClient.PostAsync(relativeUrl, bodyParameters)
@@ -122,7 +127,7 @@ namespace FritzBoxClient
         {
             if (disposing)
             {
-                //If not valid, the sid gets automatically invalid
+                //If not valid, the sid gets automatically disposed by the fritzbox
                 if (IsSidValid)
                 {
                     var bodyParams = new StringContent($"xhr=1&sid={CurrentSid}&logout=1&no_sidrenew=1", Encoding.UTF8, "application/x-www-form-urlencoded");

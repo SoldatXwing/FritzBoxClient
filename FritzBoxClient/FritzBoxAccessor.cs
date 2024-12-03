@@ -20,6 +20,7 @@ public class FritzBoxAccessor : BaseAccessor
     {
         FritzBoxAccessor accessor = new(fritzBoxPassword, EnsureUrlHasScheme(fritzBoxUrl), userName);
         await accessor.InitializeAsync();
+        await accessor.UpdateDeviceListAsync();
         return accessor;
 
     }
@@ -94,8 +95,16 @@ public class FritzBoxAccessor : BaseAccessor
     /// Retrieves all connected devices in the local network. 
     /// </summary>
     /// <returns>List of devices in the local network.</returns>
-    public async Task<List<Device>> GetAllConnectedDevciesInNetworkAsync() => await ResolveIpsAndUidForDevicesAsync(
-        JsonConvert.DeserializeObject<FritzBoxResponse>(await GetOverViewPageJsonAsync())!.Data.Net.Devices!);
+    public async Task<List<Models.NewApiModels.Device>> GetAllConnectedDevciesInNetworkAsync()
+    {
+        var rawDeviceList = JArray.Parse(await HttpRequestFritzBox("api/v0/misc/updateStatus", null, HttpRequestMethod.Get).Content.ReadAsStringAsync());
+        await UpdateDeviceListAsync();
+        return Devices!.Where(device =>
+            rawDeviceList.Any(raw => raw["deviceUID"]?.ToString() == device.UID))
+            .ToList();
+        //public async Task<List<Device>> GetAllConnectedDevciesInNetworkAsync() => await ResolveIpsAndUidForDevicesAsync(
+        //JsonConvert.DeserializeObject<FritzBoxResponse>(await GetOverViewPageJsonAsync())!.Data.Net.Devices!); <-- Works for FritzOs 7.5 Above code not tested for 7.5
+    }
     /// <summary>
     /// Retrieves the WiFi password from the router settings.
     /// </summary>

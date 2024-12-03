@@ -7,7 +7,7 @@ namespace FritzBoxClient.Tests
         [Test]
         public async Task GetAllConnectedDevicesInNetworkAsync_Success()
         {
-            List<Device> devices = await SetUp.FritzBoxAccessor!.GetAllConnectedDevciesInNetworkAsync();
+            List<Models.NewApiModels.Device> devices = await SetUp.FritzBoxAccessor!.GetAllConnectedDevciesInNetworkAsync();
             Assert.Multiple(() =>
             {
                 Assert.That(devices, Is.Not.Null);

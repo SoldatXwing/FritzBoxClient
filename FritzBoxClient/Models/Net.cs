@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
 
-public class Net
+namespace FritzBoxClient.Models
 {
-    [JsonProperty("devices")]
-    public List<Device> Devices { get; set; }
+    public class Net
+    {
+        [JsonProperty("devices")]
+        public List<Device> Devices { get; set; }
+    }
 }
-
