@@ -3,23 +3,24 @@ using FritzBoxClient.Interfaces;
 using FritzBoxClient.Models.FritzOsVersion8;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace FritzBoxClient
+namespace FritzBoxClient.Logic
 {
     public abstract class BaseAccessor : IDisposable
     {
         public string FritzModel { get; protected set; }
-        public string FritzOsVersion { get; protected set; }
+        public static double FritzOsVersion { get; protected set; }
         public double PowerConsumptionPercentage { get; protected set; }
         protected static string CurrentSid { get; set; } = null!;
         protected DateTime SidTimestamp { get; set; }
         protected bool IsSidValid
         {
-            get => (DateTime.Now - SidTimestamp) < TimeSpan.FromMinutes(10);
+            get => DateTime.Now - SidTimestamp < TimeSpan.FromMinutes(10);
         }
         protected static string FritzBoxUrl = string.Empty;
         protected string Password = string.Empty;
@@ -32,7 +33,7 @@ namespace FritzBoxClient
         /// <returns>The corrected URL with a valid scheme.</returns>
         protected static string EnsureUrlHasScheme(string url)
         {
-            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
             {
                 return "https://" + url.TrimStart('/');
             }
@@ -45,7 +46,7 @@ namespace FritzBoxClient
             var content = new StringContent($"&sid={CurrentSid}&page=overview", Encoding.UTF8, "application/x-www-form-urlencoded");
             var response = HttpRequestFritzBox("/data.lua", content, HttpRequestMethod.Post);
             var json = JObject.Parse(await response.Content.ReadAsStringAsync());
-            FritzOsVersion = json["data"]!["fritzos"]!["nspver"]!.ToObject<string>()!;
+            FritzOsVersion = json["data"]!["fritzos"]!["nspver"]!.ToObject<double>()!;
             FritzModel = json["data"]!["fritzos"]!["Productname"]!.ToObject<string>()!;
             PowerConsumptionPercentage = json["data"]!["fritzos"]!["energy"]!.ToObject<double>()!;
         }
@@ -100,8 +101,8 @@ namespace FritzBoxClient
             using var handler = new HttpClientHandler();
             handler.ServerCertificateCustomValidationCallback = (request, cert, chain, errors) => true;
             using var httpClient = new HttpClient(handler) { BaseAddress = new Uri(FritzBoxUrl) };
-            if(CurrentSid is not null)
-                httpClient.DefaultRequestHeaders.Add("AUTHORIZATION", "AVM-SID " + CurrentSid); // Needed for api routes /api/v0/...
+            if (CurrentSid is not null && FritzOsVersion >= 8.0)
+                httpClient.DefaultRequestHeaders.Add("AUTHORIZATION", "AVM-SID " + CurrentSid); // Needed for api routes /api/v0/..., only for versions 8+
             if (method is HttpRequestMethod.Post)
             {
                 var response = httpClient.PostAsync(relativeUrl, bodyParameters)
