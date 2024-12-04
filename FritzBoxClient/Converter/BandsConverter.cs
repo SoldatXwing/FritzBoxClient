@@ -1,4 +1,4 @@
-﻿using FritzBoxClient.Models;
+﻿using FritzBoxClient.Models.FritzOsVersion7;
 using Newtonsoft.Json;
 
 namespace FritzBoxClient.Converter

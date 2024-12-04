@@ -1,10 +1,10 @@
 ﻿using FritzBoxClient.Converter;
+using FritzBoxClient.Interfaces;
 using Newtonsoft.Json;
-namespace FritzBoxClient.Models.NewApiModels
+using System.Net;
+namespace FritzBoxClient.Models.FritzOsVersion8
 {
-
-
-    public class Device
+    public class Device : IDevice
     {
         [JsonProperty("myfritz_enabled")]
         public string MyFritzEnabled { get; set; }
@@ -13,10 +13,10 @@ namespace FritzBoxClient.Models.NewApiModels
         public string DeviceClassUser { get; set; }
 
         [JsonProperty("maclist")]
-        public string MacList { get; set; }
+        public string MacList { get; set; } 
 
         [JsonProperty("UID")]
-        public string UID { get; set; }
+        public string Uid { get; set; }
 
         [JsonProperty("plc_UIDs")]
         public string PlcUIDs { get; set; }
@@ -82,7 +82,8 @@ namespace FritzBoxClient.Models.NewApiModels
         public bool StaticDhcp { get; set; }
 
         [JsonProperty("ip")]
-        public string Ip { get; set; }
+        [JsonConverter(typeof(IPAddressConverter))]
+        public IPAddress Ip { get; set; }
 
         [JsonProperty("firstused")]
         public long FirstUsed { get; set; }
@@ -226,7 +227,7 @@ namespace FritzBoxClient.Models.NewApiModels
         [JsonProperty("UID")]
         public string Uid { get; set; }
 
-        
+
     }
 
 

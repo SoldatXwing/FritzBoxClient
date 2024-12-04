@@ -1,4 +1,4 @@
-﻿namespace FritzBoxClient.Models
+﻿namespace FritzBoxClient.Enums
 {
     public enum InternetState
     {

@@ -1,4 +1,8 @@
-﻿using FritzBoxClient.Models.EnergyModels;
+﻿using FritzBoxClient.Enums;
+using FritzBoxClient.Interfaces;
+using FritzBoxClient.Models.EnergyModels;
+using FritzBoxClient.Models.FritzOsVersion7;
+using FritzBoxClient.Models.FritzOsVersion8;
 
 namespace FritzBoxClient.Tests
 {
@@ -7,7 +11,7 @@ namespace FritzBoxClient.Tests
         [Test]
         public async Task GetAllConnectedDevicesInNetworkAsync_Success()
         {
-            List<Models.NewApiModels.Device> devices = await SetUp.FritzBoxAccessor!.GetAllConnectedDevciesInNetworkAsync();
+            var devices = await SetUp.FritzBoxAccessor!.GetAllConnectedDevciesInNetworkAsync();
             Assert.Multiple(() =>
             {
                 Assert.That(devices, Is.Not.Null);
@@ -20,7 +24,7 @@ namespace FritzBoxClient.Tests
             var exception = Assert.ThrowsAsync<NotImplementedException>(async () =>
                 await SetUp.FritzBoxAccessor!.ChangeInternetAccessStateForDeviceAsync(
                     "",
-                    FritzBoxClient.Models.InternetState.Unlimited,
+                    InternetState.Unlimited,
                     new System.Net.IPAddress(new byte[] { 2, 2, 2, 2 }),
                     ""
                 )

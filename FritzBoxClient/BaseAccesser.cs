@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using FritzBoxClient.Enums;
+using FritzBoxClient.Interfaces;
+using FritzBoxClient.Models.FritzOsVersion8;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -9,7 +12,6 @@ namespace FritzBoxClient
 {
     public abstract class BaseAccessor : IDisposable
     {
-        protected List<Models.NewApiModels.Device>? Devices { get; set; }
         public string FritzModel { get; protected set; }
         public string FritzOsVersion { get; protected set; }
         public double PowerConsumptionPercentage { get; protected set; }
@@ -47,7 +49,6 @@ namespace FritzBoxClient
             FritzModel = json["data"]!["fritzos"]!["Productname"]!.ToObject<string>()!;
             PowerConsumptionPercentage = json["data"]!["fritzos"]!["energy"]!.ToObject<double>()!;
         }
-        protected async Task UpdateDeviceListAsync() => Devices = JsonConvert.DeserializeObject<List<Models.NewApiModels.Device>>(JObject.Parse(await HttpRequestFritzBox("api/v0/landevice", null, HttpRequestMethod.Get).Content.ReadAsStringAsync())["landevice"]!.ToString());
 
         protected static string CalculateMD5(string input)
         {

@@ -27,7 +27,7 @@ namespace FritzBoxClient.Tests
             if (string.IsNullOrEmpty(password))
                 throw new InvalidOperationException("Password is not present in AppSettings!");
 
-            FritzBoxAccessor = await FritzBoxAccessor.CreateAsync(password, fritzBoxUrl, fritzUserName);
+            FritzBoxAccessor = await FritzBoxAccessor.CreateAsync(password, Enums.FritzOsVersion.Version8, fritzBoxUrl, fritzUserName);
             NasAccessor = await FritzBoxNasAccessor.CreateAsync(password, fritzBoxUrl, fritzUserName);
         }
         [OneTimeTearDown]

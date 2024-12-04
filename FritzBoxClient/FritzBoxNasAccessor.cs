@@ -1,4 +1,5 @@
-﻿using FritzBoxClient.Exceptions.NasExceptions;
+﻿using FritzBoxClient.Enums;
+using FritzBoxClient.Exceptions.NasExceptions;
 using FritzBoxClient.Models.ErrorModels;
 using FritzBoxClient.Models.NasModels;
 using Newtonsoft.Json;

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace FritzBoxClient.Models
+namespace FritzBoxClient.Models.FritzOsVersion7
 {
     public class FritzBoxResponse
     {
